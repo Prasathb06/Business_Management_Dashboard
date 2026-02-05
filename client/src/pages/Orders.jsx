@@ -6,6 +6,10 @@ import Layout from "../components/Layout";
 const Orders = () => {
     const [orders, setOrders] = useState([]);
 
+
+    const user = JSON.parse(localStorage.getItem("user"));
+    const role = user?.role;
+
     const fetchOrders = async () => {
         const res = await API.get("/orders");
         setOrders(res.data);
@@ -26,6 +30,11 @@ const Orders = () => {
         <Layout>
             <Paper style={{ padding: 20 }}>
                 <Typography variant="h6">Orders</Typography>
+                {role === "admin" && (
+                    <Button variant="contained">
+                        Create Order
+                    </Button>
+                )}
 
                 <Table>
                     <TableHead>

@@ -1,14 +1,16 @@
 const express = require("express");
+const router = express.Router();
+const auth = require("../middleware/authMiddleware");
+const checkRole = require("../middleware/roleMiddleware");
 const { createOrder, getOrders, updateOrderStatus } = require("../controllers/orderControllers");
 
-const authMiddleware = require("../middleware/authMiddleware");
 
-const router = express.Router();
+router.get("/", auth, checkRole(["admin", "staff"]), getOrders);
 
-router.use(authMiddleware);
 
-router.post("/", createOrder);
-router.get("/", getOrders);
-router.put("/:id", updateOrderStatus);
+router.post("/", auth, checkRole(["admin"]), createOrder);
+router.put("/:id", auth, checkRole(["admin"]), updateOrder);
+router.delete("/:id", auth, checkRole(["admin"]), deleteOrder);
 
 module.exports = router;
+

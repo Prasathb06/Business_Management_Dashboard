@@ -1,4 +1,4 @@
-import { Drawer, List, ListItem, ListItemText } from "@mui/material";
+import { Drawer, List, ListItem, ListItemButton, ListItemText } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
@@ -7,22 +7,35 @@ const Sidebar = () => {
 
     return (
         <Drawer variant="permanent">
-            <List style={{ width: 220 }}>
-                <ListItem button onClick={() => navigate("/")}>
-                    <ListItemText primary="Dashboard" />
+            <List sx={{ width: 220 }}>
+
+
+                <ListItem disablePadding>
+                    <ListItemButton onClick={() =>
+                        role === "admin"
+                            ? navigate("/dashboard")
+                            : navigate("/staff")
+                    }>
+                        <ListItemText primary="Dashboard" />
+                    </ListItemButton>
                 </ListItem>
 
-                {
-                    role === "admin" && (
-                        <ListItem button onClick={() => navigate("/products")}>
+
+                {role === "admin" && (
+                    <ListItem disablePadding>
+                        <ListItemButton onClick={() => navigate("/products")}>
                             <ListItemText primary="Products" />
-                        </ListItem>
-                    )
-                }
+                        </ListItemButton>
+                    </ListItem>
+                )}
 
-                <ListItem button onClick={() => navigate("/orders")}>
-                    <ListItemText primary="Orders" />
+
+                <ListItem disablePadding>
+                    <ListItemButton onClick={() => navigate("/orders")}>
+                        <ListItemText primary="Orders" />
+                    </ListItemButton>
                 </ListItem>
+
             </List>
         </Drawer>
     );

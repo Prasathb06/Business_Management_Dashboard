@@ -7,8 +7,10 @@ const Register = () => {
     const [form, setForm] = useState({
         name: "",
         email: "",
-        password: ""
+        password: "",
+        role: "staff"
     });
+
 
     const navigate = useNavigate();
 
@@ -64,6 +66,20 @@ const Register = () => {
                         name="password"
                         onChange={handleChange}
                     />
+
+                    <TextField
+                        select
+                        label="Role"
+                        name="role"
+                        fullWidth
+                        margin="normal"
+                        SelectProps={{ native: true }}
+                        onChange={handleChange}
+                    >
+                        <option value="staff">Staff</option>
+                        <option value="admin">Admin</option>
+                    </TextField>
+
 
                     <Button
                         fullWidth

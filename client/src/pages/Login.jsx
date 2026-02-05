@@ -12,14 +12,17 @@ const Login = () => {
 
     const handleLogin = async () => {
         try {
-            const res = await API.post("/auth/login", {
-                email,
-                password
-            });
+            const res = await API.post("/auth/login", { email, password });
+
             login(res.data.user, res.data.token);
-            navigate("/dashboard")
+
+            if (res.data.user.role === "admin") {
+                navigate("/dashboard");
+            } else {
+                navigate("/staff");
+            }
         } catch (err) {
-            alert("Invalid credentials");
+            alert("login Failed");
         }
     };
 
