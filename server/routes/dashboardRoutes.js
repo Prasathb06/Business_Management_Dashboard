@@ -1,11 +1,9 @@
 const express = require("express");
-const authMiddleware = require("../middleware/authMiddleware");
-const {
-    getDashboardStats
-} = require("../controllers/dashboardControllers");
-
 const router = express.Router();
+const auth = require("../middleware/authMiddleware");
+const { getDashboardStats, getMonthlySales } = require("../controllers/dashboardController");
 
-router.get("/stats", authMiddleware, getDashboardStats);
+router.get("/", auth, getDashboardStats);
+router.get("/sales", auth, checkRole(["admin"]), getMonthlySales);
 
 module.exports = router;

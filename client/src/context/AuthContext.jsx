@@ -14,10 +14,11 @@ const AuthProvider = ({ children }) => {
     setUser(userData);
   };
 
+
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
     setUser(null);
+    localStorage.clear();
+    window.location.href = "/login";
   };
 
   return (

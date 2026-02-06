@@ -13,9 +13,18 @@ exports.createOrder = async (req, res) => {
 
 exports.getOrders = async (req, res) => {
     try {
-        const orders = await Order.find()
-            .populate("products.productId", "title price")
-            .sort({ createdAt: -1 });
+        let orders;
+
+        if (req.user.role === "admin") {
+            orders = await Order.find()
+                .populate("products.productId", "title price")
+                .populate("assignedTo", "name email")
+                .sort({ createdAt: -1 });
+        } else {
+            orders = await Order.find({ assignedTo: req.user.id })
+                .populate("products.productId", "title price")
+                .sort({ createdAt: -1 });
+        }
 
         res.json(orders);
     } catch (err) {
@@ -24,11 +33,34 @@ exports.getOrders = async (req, res) => {
 };
 
 
+
+
+
 exports.updateOrderStatus = async (req, res) => {
+  const { status } = req.body;
+
+  const allowedStatus = ["Processing", "Shipped", "Delivered", "Cancelled"];
+  if (!allowedStatus.includes(status)) {
+    return res.status(400).json({ message: "Invalid status" });
+  }
+
+  const order = await Order.findByIdAndUpdate(
+    req.params.id,
+    { status },
+    { new: true }
+  );
+
+  res.json(order);
+};
+
+
+exports.assignOrderToStaff = async (req, res) => {
     try {
+        const { staffId } = req.body;
+
         const order = await Order.findByIdAndUpdate(
             req.params.id,
-            { status: req.body.status },
+            { assignedTo: staffId },
             { new: true }
         );
 

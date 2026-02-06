@@ -1,40 +1,51 @@
 import { useEffect, useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableRow, Paper, Button, Typography } from "@mui/material";
+import { Table, TableBody, TableCell, TableHead, TableRow, Paper, Typography, Select, MenuItem, Box } from "@mui/material";
 import API from "../services/api";
 import Layout from "../components/Layout";
 
 const Orders = () => {
     const [orders, setOrders] = useState([]);
 
-
     const user = JSON.parse(localStorage.getItem("user"));
     const role = user?.role;
 
     const fetchOrders = async () => {
-        const res = await API.get("/orders");
-        setOrders(res.data);
+        try {
+            const res = await API.get("/orders");
+            setOrders(res.data);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const fetchStaff = async () => {
+        const res = await API.get("/users?role=staff");
+        setStaffList(res.data);
     };
 
     useEffect(() => {
         fetchOrders();
+        if (role === "admin") {
+            fetchStaff();
+        }
     }, []);
 
-    const updateStatus = async (id) => {
-        await API.put(`/orders/${id}`, {
-            status: "Delivered"
-        });
-        fetchOrders();
+
+    const updateStatus = async (orderId, status) => {
+        try {
+            await API.put(`/orders/${orderId}`, { status });
+            fetchOrders();
+        } catch (err) {
+            alert("Status update failed");
+        }
     };
 
     return (
         <Layout>
-            <Paper style={{ padding: 20 }}>
-                <Typography variant="h6">Orders</Typography>
-                {role === "admin" && (
-                    <Button variant="contained">
-                        Create Order
-                    </Button>
-                )}
+            <Paper sx={{ p: 3 }}>
+                <Typography variant="h6" mb={2}>
+                    Orders
+                </Typography>
 
                 <Table>
                     <TableHead>
@@ -51,24 +62,34 @@ const Orders = () => {
                             <TableRow key={order._id}>
                                 <TableCell>
                                     {order.products.map((p, i) => (
-                                        <div key={i}>
+                                        <Box key={i}>
                                             {p.productId?.title} × {p.quantity}
-                                        </div>
+                                        </Box>
                                     ))}
                                 </TableCell>
 
                                 <TableCell>₹{order.totalAmount}</TableCell>
-                                <TableCell>{order.status}</TableCell>
 
                                 <TableCell>
-                                    {order.status === "Pending" && (
-                                        <Button
-                                            variant="contained"
-                                            onClick={() => updateStatus(order._id)}
-                                        >
-                                            Mark Delivered
-                                        </Button>
-                                    )}
+                                    <TableCell>
+                                        {(role === "admin" || role === "staff") && (
+                                            <Select
+                                                size="small"
+                                                value={order.status}
+                                                onChange={(e) => updateStatus(order._id, e.target.value)}
+                                            >
+                                                <MenuItem value="Pending">Pending</MenuItem>
+                                                <MenuItem value="Processing">Processing</MenuItem>
+                                                <MenuItem value="Shipped">Shipped</MenuItem>
+                                                <MenuItem value="Delivered">Delivered</MenuItem>
+                                                <MenuItem value="Cancelled">Cancelled</MenuItem>
+                                            </Select>
+                                        )}
+                                    </TableCell>
+                                </TableCell>
+
+                                <TableCell>
+                                    {role === "admin" ? "Editable" : "View Only"}
                                 </TableCell>
                             </TableRow>
                         ))}

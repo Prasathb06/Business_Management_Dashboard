@@ -8,14 +8,18 @@ const orderSchema = new mongoose.Schema(
                     type: mongoose.Schema.Types.ObjectId,
                     ref: "Product"
                 },
-                quantity: { type: Number, default: 1 }
+                quantity: Number
             }
         ],
-        totalAmount: { type: Number, required: true },
         status: {
             type: String,
-            enum: ["Pending", "Delivered"],
-            default: "Pending"
+            enum: ["Placed", "Processing", "Shipped", "Delivered", "Cancelled"],
+            default: "Placed"
+        },
+        assignedTo: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            default: null
         }
     },
     { timestamps: true }
